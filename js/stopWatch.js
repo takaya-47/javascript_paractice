@@ -16,6 +16,11 @@
 
   // スタートボタン押下時のイベント
   start.addEventListener("click", () => {
+    // スタートボタンが一度押されていたら２回目は押せないようにする
+    if (start.classList.contains('inactive')) {
+      return;
+    }
+
     setButtonStateRunnning();
     // スタートボタン押下時の時刻を取得
     startTime = Date.now();
@@ -41,6 +46,11 @@
 
   // ストップボタン押下時のイベント
   stop.addEventListener("click", () => {
+    // ストップボタンが一度押されていたら２回目は押せないようにする
+    if (stop.classList.contains("inactive")) {
+      return;
+    }
+
     setButtonStateStopped();
     // setTimeout()の解除
     clearTimeout(timeOutId);
@@ -50,6 +60,11 @@
 
   // リセットボタン押下時のイベント
   reset.addEventListener("click", () => {
+    // リセットボタンが一度押されていたら２回目は押せないようにする
+    if (reset.classList.contains("inactive")) {
+      return;
+    }
+
     setButtonStateInitial();
     timer.textContent = "00:00.000";
     elapsedTime = 0;
@@ -57,22 +72,22 @@
 
   // 初期画面でのボタンの非活性化設定
   function setButtonStateInitial() {
-    stop.disabled = true;
-    reset.disabled = true;
-    start.disabled = false;
+    stop.classList.add('inactive');
+    reset.classList.add('inactive');
+    start.classList.remove('inactive');
   }
 
   // タイマーが走っている時のボタンの非活性化設定
   function setButtonStateRunnning() {
-    stop.disabled = false;
-    reset.disabled = true;
-    start.disabled = true;
+    stop.classList.remove('inactive');
+    reset.classList.add('inactive');
+    start.classList.add('inactive');
   }
 
   // タイマーがストップしている時のボタンの非活性化設定
   function setButtonStateStopped() {
-    stop.disabled = true;
-    reset.disabled = false;
-    start.disabled = false;
+    stop.classList.add('inactive');
+    reset.classList.remove('inactive');
+    start.classList.remove('inactive');
   }
 }
