@@ -1,0 +1,51 @@
+body {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+table {
+  border: 2px solid #eee;
+  border-collapse: collapse;
+}
+
+thead,
+tfoot {
+  background-color: #eee;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: center;
+}
+
+/* 日曜日 */
+tbody td:first-child {
+  color: red;
+}
+
+/* 土曜日 */
+tbody td:last-child {
+  color: blue;
+}
+
+tfoot {
+  font-weight: bold;
+}
+
+/* 前月と翌月の日付用 */
+td.disabled {
+  opacity: 0.3;
+}
+
+/* 今日の日付用 */
+td.today {
+  font-weight: bold;
+}
+
+#previous,
+#next,
+#today {
+  cursor: pointer;
+  user-select: none;
+}
