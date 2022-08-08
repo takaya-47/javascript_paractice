@@ -22,9 +22,8 @@
         }
       );
     }
-    console.log(dates);
+    return dates;
   }
-  getCalendarHead();
 
   // 今月分の日付を作成
   function getCalendarBody() {
@@ -40,9 +39,8 @@
         }
       );
     }
-    console.log(dates);
+    return dates;
   }
-  getCalendarBody();
 
   // 翌月分の日付を取得
   function getCalendarTail() {
@@ -60,7 +58,38 @@
         }
       );
     }
-    console.log(dates);
+    return dates;
   }
-  getCalendarTail();
+
+  // 全ての日付を合算
+  function createCalendar() {
+    // 表示する日付が入った配列
+    const dates = getCalendarHead().concat(getCalendarBody(), getCalendarTail());
+    // 週ごとの日付に分割
+    const weeks = [];
+    const weeksCount = dates.length / 7;
+    for (let i = 0; i < weeksCount; i++) {
+      weeks.push(dates.splice(0, 7));
+    }
+
+    weeks.forEach(week => {
+      const tr = document.createElement('tr');
+      week.forEach(date => {
+        const td = document.createElement('td');
+        td.textContent = date.date;
+
+        if (date.isToday) {
+          td.classList.add('today');
+        }
+
+        if (date.isDisabled) {
+          td.classList.add('disabled');
+        }
+
+        tr.appendChild(td);
+      });
+      document.querySelector('tbody').appendChild(tr);
+    });
+  }
+  createCalendar();
 }
