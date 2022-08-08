@@ -1,8 +1,9 @@
 'use strict';
 
 {
-  const year = 2022;
-  const month = 6; // JSでは月は0から始まるので7月は6となる
+  const today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth(); // JSでは月は0から始まるので7月は6となる
 
   // 先月の日付部分を取得
   function getCalendarHead() {
@@ -39,6 +40,12 @@
         }
       );
     }
+
+    // 今日の日付を太字にする
+    if (year === today.getFullYear() && month === today.getMonth()) {
+      dates[today.getDate() - 1].isToday = true;
+    }
+
     return dates;
   }
 
@@ -54,17 +61,33 @@
         {
           date: i,
           isToday: false,
-          isDisabled: false,
+          isDisabled: true,
         }
       );
     }
     return dates;
   }
 
-  // 全ての日付を合算
-  function createCalendar() {
+  function clearCalendar() {
+    const tbody = document.querySelector("tbody");
+    // 最初の子要素が存在すれば削除する
+    while (tbody.firstChild) {
+      tbody.removeChild(tbody.firstChild);
+    }
+  }
+
+  function renderTitle() {
+    // タイトルの表示
+    const title = `${year}/${String(month + 1).padStart(2, 0)}`;
+    document.getElementById('title').textContent = title;
+  }
+
+  function renderWeeks() {
     // 表示する日付が入った配列
-    const dates = getCalendarHead().concat(getCalendarBody(), getCalendarTail());
+    const dates = getCalendarHead().concat(
+      getCalendarBody(),
+      getCalendarTail()
+    );
     // 週ごとの日付に分割
     const weeks = [];
     const weeksCount = dates.length / 7;
@@ -72,24 +95,65 @@
       weeks.push(dates.splice(0, 7));
     }
 
-    weeks.forEach(week => {
-      const tr = document.createElement('tr');
-      week.forEach(date => {
-        const td = document.createElement('td');
+    weeks.forEach((week) => {
+      const tr = document.createElement("tr");
+      week.forEach((date) => {
+        const td = document.createElement("td");
         td.textContent = date.date;
 
         if (date.isToday) {
-          td.classList.add('today');
+          td.classList.add("today");
         }
 
         if (date.isDisabled) {
-          td.classList.add('disabled');
+          td.classList.add("disabled");
         }
 
         tr.appendChild(td);
       });
-      document.querySelector('tbody').appendChild(tr);
+      document.querySelector("tbody").appendChild(tr);
     });
   }
+
+  // 全ての日付を合算
+  function createCalendar() {
+    clearCalendar();
+    renderTitle();
+    renderWeeks();
+  }
   createCalendar();
+
+  // 前月の矢印をクリックした時のイベント
+  document.getElementById('previous').addEventListener('click', () => {
+    // 月をマイナス１する
+    month--;
+    if (month < 0) {
+      // 年度をマイナス１して、月を12月に再設定
+      year--;
+      month = 11;
+    }
+    // カレンダーを再描画
+    createCalendar();
+  });
+
+  // 翌月の矢印をクリックした時のイベント
+  document.getElementById('next').addEventListener('click', () => {
+    // 月をプラス１する
+    month++;
+    if (month > 11) {
+      // 年度をプラス１して、月を１月に再設定
+      year++;
+      month = 0;
+    }
+    // カレンダーを再描画
+    createCalendar();
+  });
+
+  // 「Today」をクリックした時のイベント
+  document.getElementById('today').addEventListener('click', () => {
+    year = today.getFullYear();
+    month = today.getMonth();
+    // カレンダーを再描画
+    createCalendar();
+  });
 }
