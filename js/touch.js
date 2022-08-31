@@ -5,6 +5,9 @@
     constructor() {
       this.ele = document.createElement("li");
       this.ele.classList.add("pressed");
+      this.ele.addEventListener("click", () => {
+        this.check();
+      });
     }
 
     /**
@@ -22,6 +25,19 @@
     activate(num) {
       this.ele.classList.remove("pressed");
       this.ele.textContent = num;
+    }
+    /**
+     * タッチすべき数値とクリックしたパネルの数値が同じかどうかチェックします。
+     */
+    check() {
+      if (currentNum === Number(this.ele.textContent)) {
+        this.ele.classList.add("pressed");
+        currentNum++;
+        // 全てのパネルを押し終わったらタイマーをストップする
+        if (currentNum === 4) {
+          clearTimeout(timeoutId);
+        }
+      }
     }
   }
 
@@ -59,9 +75,32 @@
   }
 
   const board = new Board();
+  let currentNum;
+  let startTime;
+  let timeoutId;
 
   const button = document.getElementById('button');
   button.addEventListener('click', () => {
+    // すでにタイマーが起動していたらスタートボタン押下のたびに解除する
+    if (typeof timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+
     board.activate();
+    startTime = Date.now(); // スタートボタン押下時の時間
+    runTimer();
+    currentNum = 0;
   });
+
+  /**
+   * タイマーを起動します。
+   */
+  function runTimer() {
+    const timer = document.getElementById('timer');
+    timer.textContent = ((Date.now() - startTime) / 1000).toFixed(2);
+
+    timeoutId = setTimeout(() => {
+      runTimer();
+    }, 10)
+  }
 }
