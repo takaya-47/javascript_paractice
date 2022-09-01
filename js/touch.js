@@ -2,7 +2,8 @@
 
 {
   class Panel {
-    constructor() {
+    constructor(game) {
+      this.game = game; // Gameクラスのインスタンス
       this.ele = document.createElement("li");
       this.ele.classList.add("pressed");
       this.ele.addEventListener("click", () => {
@@ -30,22 +31,23 @@
      * タッチすべき数値とクリックしたパネルの数値が同じかどうかチェックします。
      */
     check() {
-      if (currentNum === Number(this.ele.textContent)) {
+      if (this.game.getCurrentNum() === Number(this.ele.textContent)) {
         this.ele.classList.add("pressed");
-        currentNum++;
+        this.game.addCurrentNum();
         // 全てのパネルを押し終わったらタイマーをストップする
-        if (currentNum === 4) {
-          clearTimeout(timeoutId);
+        if (this.game.getCurrentNum() === 4) {
+          clearTimeout(this.game.getTimeoutId());
         }
       }
     }
   }
 
   class Board {
-    constructor() {
+    constructor(game) {
+      this.game = game; // Gameクラスのインスタンス
       this.panels = [];
       for (let i = 0; i < 4; i++) {
-        this.panels.push(new Panel());
+        this.panels.push(new Panel(this.game));
       }
       this.setUp();
     }
@@ -74,33 +76,67 @@
     }
   }
 
-  const board = new Board();
-  let currentNum;
-  let startTime;
-  let timeoutId;
+  class Game {
+    constructor() {
+      this.board = new Board(this); // thisはGameクラスのインスタンス
+      this.currentNum = undefined;
+      this.startTime = undefined;
+      this.timeoutId = undefined;
 
-  const button = document.getElementById('button');
-  button.addEventListener('click', () => {
-    // すでにタイマーが起動していたらスタートボタン押下のたびに解除する
-    if (typeof timeoutId !== undefined) {
-      clearTimeout(timeoutId);
+      const button = document.getElementById('button');
+      button.addEventListener('click', () => {
+        this.start();
+      });
     }
 
-    board.activate();
-    startTime = Date.now(); // スタートボタン押下時の時間
-    runTimer();
-    currentNum = 0;
-  });
+    /**
+     * currentNumに１を加算します。
+     */
+    addCurrentNum() {
+      this.currentNum++;
+    }
 
-  /**
-   * タイマーを起動します。
-   */
-  function runTimer() {
-    const timer = document.getElementById('timer');
-    timer.textContent = ((Date.now() - startTime) / 1000).toFixed(2);
+    /**
+     * currentNumのゲッター
+     */
+    getCurrentNum() {
+      return this.currentNum;
+    }
 
-    timeoutId = setTimeout(() => {
-      runTimer();
-    }, 10)
+    /**
+     * timeoutIdのゲッター
+     */
+    getTimeoutId() {
+      return this.timeoutId;
+    }
+
+    /**
+     * スタートボタン押下時の処理
+     */
+    start() {
+      // すでにタイマーが起動していたらスタートボタン押下のたびに解除する
+      if (typeof this.timeoutId !== undefined) {
+        clearTimeout(this.timeoutId);
+      }
+
+      this.board.activate();
+      this.startTime = Date.now(); // スタートボタン押下時の時間
+      this.runTimer();
+      this.currentNum = 0;
+    }
+
+    /**
+     * タイマーを起動します。
+     */
+    runTimer() {
+      const timer = document.getElementById('timer');
+      timer.textContent = ((Date.now() - this.startTime) / 1000).toFixed(2);
+
+      this.timeoutId = setTimeout(() => {
+        this.runTimer();
+      }, 10);
+    }
   }
+
+  new Game();
 }
